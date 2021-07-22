@@ -6,15 +6,19 @@ import json
 import os
 
 
+my_env = os.environ.copy()
+
+
 def read_credentials():
     with open('.yc_pg_credentials', 'r') as f:
         creds = json.load(f)
     return creds
 
 
-def sh(cmd, input=''):
+def sh(cmd, input='', env=my_env):
     rst = subprocess.run(
         cmd,
+        env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         input=input.encode("utf-8"),
@@ -52,12 +56,13 @@ hostname = cluster_hostname(creds['cluster_id'])
 
 for db in get_pg_databases(creds['cluster_id']):
     cmd = [
-        'PGPASSWORD="{}"'.format(creds["users"][db["owner"]]),
         'pg_dump',
         '-h', hostname,
         '-p', '6432',
         '-U', db['owner'],
         db['name'], '>', db['name'] + '.sql'
     ]
-    sh(cmd)
+    my_env['PGPASSWORD'] = creds["users"][db["owner"]]
+    # cmd = 'pg_dump -h c-c9qvr67bgnv24polhecq.rw.mdb.yandexcloud.net -p 6432 -U user1c dombrovskaya > dombrovskaya.sql'
     # print(cmd)
+    sh(cmd, env=my_env)
