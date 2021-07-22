@@ -60,9 +60,6 @@ cmd = f"rm -rf {creds['backup_path']}/*.sql.tar.gz"
 sh(cmd, shell=True)
 
 for db in get_pg_databases(creds['cluster_id']):
-
-    if db['name'] != 'db1':
-        continue
     dt = datetime.datetime.now()
     date = dt.strftime("%Y-%m-%d_%H:%M")
     filename_path = f"{creds['backup_path']}/{db['name']}_{date}.sql"
