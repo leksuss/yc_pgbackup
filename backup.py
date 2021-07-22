@@ -6,13 +6,18 @@ import json
 import os
 
 
-def sh(cmd, input="", env=my_env):
+def read_credentials():
+    with open('.yc_pg_credentials', 'r') as f:
+        creds = json.load(f)
+    return creds
+
+
+def sh(cmd, input=''):
     rst = subprocess.run(
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         input=input.encode("utf-8"),
-        env=my_env
     )
     assert rst.returncode == 0, rst.stderr.decode("utf-8")
     return rst.stdout.decode("utf-8").strip()
@@ -42,11 +47,12 @@ def get_pg_databases(cluster_id):
     return json.loads(sh(cmd))
 
 
-hostname = cluster_hostname(cluster_id)
+creds = read_credentials()
+hostname = cluster_hostname(creds['cluster_id'])
 
-
-for db in get_pg_databases(cluster_id):
+for db in get_pg_databases(creds['cluster_id']):
     cmd = [
+        'PGPASSWORD="{}"'.format(creds["users"][db["owner"]]),
         'pg_dump',
         '-h', hostname,
         '-p', '6432',
