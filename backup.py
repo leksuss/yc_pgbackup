@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 my_env = os.environ.copy()
+my_env['PATH'] += f":{my_env['HOME']}/yandex-cloud/bin"
 path = str(Path(__file__).parent.absolute())
 
 
