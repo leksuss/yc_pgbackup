@@ -1,7 +1,10 @@
-import subprocess
 import datetime
 import json
+import subprocess
 import os
+import requests
+import time
+
 from pathlib import Path
 
 
@@ -53,12 +56,26 @@ def get_pg_databases(cluster_id):
     return json.loads(sh(cmd))
 
 
+def clean_trash(token):
+    headers = {
+        "Accept": "application/json",
+        'Authorization': 'OAuth ' + token
+    }
+
+    url = 'https://cloud-api.yandex.net/v1/disk/trash/resources'
+    r = requests.delete(url=url, headers=headers)
+
+
 creds = read_credentials()
-hostname = cluster_hostname(creds['cluster_id'])
 
 # remove old backup files
-cmd = f"rm -rf {creds['backup_path']}/*.sql.tar.gz"
-sh(cmd, shell=True)
+old_backup_files = os.listdir(creds['backup_path'])
+for file in old_backup_files:
+    cmd = f"rm -f {creds['backup_path']}/{file}"
+    sh(cmd, shell=True)
+    clean_trash(creds['ya_disk_token'])
+
+hostname = cluster_hostname(creds['cluster_id'])
 
 for db in get_pg_databases(creds['cluster_id']):
     dt = datetime.datetime.now()
