@@ -36,8 +36,9 @@ def time_stamp():
     return str(datetime.datetime.now().replace(microsecond=0))
 
 
-def tprint(printed_val):
-    print(time_stamp(), printed_val)
+def tprint(*printed_val):
+    print(time_stamp(), end=' ')
+    print(*printed_val)
 
 
 def cluster_hostname(cluster_id):
