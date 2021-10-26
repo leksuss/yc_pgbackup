@@ -32,6 +32,14 @@ def sh(cmd, input='', env=my_env, shell=False):
     return rst.stdout.decode("utf-8").strip()
 
 
+def time_stamp():
+    return str(datetime.datetime.now().replace(microsecond=0))
+
+
+def tprint(printed_val):
+    print(time_stamp(), printed_val)
+
+
 def cluster_hostname(cluster_id):
     cmd = [
         'yc',
@@ -72,8 +80,12 @@ creds = read_credentials()
 old_backup_files = os.listdir(creds['backup_path'])
 for file in old_backup_files:
     cmd = f"rm -f {creds['backup_path']}/{file}"
+    tprint("Deleting", file)
     sh(cmd, shell=True)
+    time.sleep(5)
+    tprint("Clean trash from file", file)
     clean_trash(creds['ya_disk_token'])
+
 
 hostname = cluster_hostname(creds['cluster_id'])
 
@@ -93,15 +105,15 @@ for db in get_pg_databases(creds['cluster_id']):
 
     my_env['PGPASSWORD'] = creds['users'][db['owner']]
 
-    print(f"Dumping DB {db['name']} ...")
+    tprint(f"Dumping DB {db['name']} ...")
     try:
         sh(cmd, env=my_env)
-        print(f"DB {db['name']} dumped to file {filename_path}")
+        tprint(f"DB {db['name']} dumped to file {filename_path}")
     except AssertionError as e:
-        print(e)
-        print(f"Backing up DB {db['name']} failed")
+        tprint(e)
+        tprint(f"Backing up DB {db['name']} failed")
 
-    print(f"Compress dumped DB {db['name']}...")
+    tprint(f"Compress dumped DB {db['name']}...")
     filename_path_gz = f"{filename_path}.tar.gz"
     sh([
         "tar",
@@ -110,4 +122,4 @@ for db in get_pg_databases(creds['cluster_id']):
         filename_path_gz,
         filename_path
     ])
-    print(f"DB {db['name']} file compressed to {filename_path_gz}")
+    tprint(f"DB {db['name']} file compressed to {filename_path_gz}")
