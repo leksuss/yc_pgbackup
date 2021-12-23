@@ -98,6 +98,10 @@ for file in old_backup_files:
 hostname = cluster_hostname(creds['cluster_id'])
 
 for db in get_pg_databases(creds['cluster_id']):
+
+    if db in config['exclude_dbs']:
+        continue
+
     dt = datetime.datetime.now()
     date = dt.strftime("%Y-%m-%d_%H:%M")
     filename_path = f"{config['backup_path']}/{db['name']}_{date}.sql"
