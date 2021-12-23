@@ -99,7 +99,7 @@ hostname = cluster_hostname(creds['cluster_id'])
 
 for db in get_pg_databases(creds['cluster_id']):
 
-    if db in config['exclude_dbs']:
+    if db['name'] in config['exclude_dbs']:
         continue
 
     dt = datetime.datetime.now()
