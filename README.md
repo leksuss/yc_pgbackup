@@ -14,7 +14,19 @@ No any additional python packages needed, so you don't need create virtual envir
 1. install [CLI for Yandex.Cloud](https://cloud.yandex.com/en/docs/cli/operations/install-cli)
 2. install [Yandex.Disk for linux](https://yandex.com/support/disk-desktop-linux/)
 3. rename example credentials file from `.yc_pg_credentials_example` to `.yc_pg_credentials` and fill your credentials data
-4. run `backup.py` script like `python3 backup.py`
+4. rename example config file from `config.cfg_example` to `config.cfg` and fill it according example
+5. run `backup.py` script like `python3 backup.py`, check if it works fine
+6. add to cron like this:
+```
+# run every day at 3:41 AM
+41 3 * * * /usr/bin/python3 /home/username/yc_pgbackup/backup.py >> ~/backup.log 2>&1
+```
+
+### Config script
+
+Config file and credentials file are JSON files, so don't forget to follow the JSON format.
+
+You can exclude certain databases from backup proccedure, just enter value for key `exclude_dbs` in config file. It is a list type, so you can enter any count of databases you need. If you wish to backup all databases, just leave this list blank like this: `[]`.
 
 
 ### Some notes with Yandex PostgreSQL Cluster
