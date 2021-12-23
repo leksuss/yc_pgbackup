@@ -19,6 +19,12 @@ def read_credentials(path=path):
     return creds
 
 
+def read_config(path=path):
+    with open(path + '/config.cfg', 'r') as f:
+        config = json.load(f)
+    return config
+
+
 def sh(cmd, input='', env=my_env, shell=False):
     rst = subprocess.run(
         cmd,
@@ -76,11 +82,12 @@ def clean_trash(token):
 
 
 creds = read_credentials()
+config = read_config()
 
 # remove old backup files
-old_backup_files = os.listdir(creds['backup_path'])
+old_backup_files = os.listdir(config['backup_path'])
 for file in old_backup_files:
-    cmd = f"rm -f {creds['backup_path']}/{file}"
+    cmd = f"rm -f {config['backup_path']}/{file}"
     tprint("Deleting", file)
     sh(cmd, shell=True)
     time.sleep(5)
@@ -93,7 +100,7 @@ hostname = cluster_hostname(creds['cluster_id'])
 for db in get_pg_databases(creds['cluster_id']):
     dt = datetime.datetime.now()
     date = dt.strftime("%Y-%m-%d_%H:%M")
-    filename_path = f"{creds['backup_path']}/{db['name']}_{date}.sql"
+    filename_path = f"{config['backup_path']}/{db['name']}_{date}.sql"
 
     cmd = [
         'pg_dump',

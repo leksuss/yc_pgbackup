@@ -1,0 +1,7 @@
+{
+    "backup_path": "ABS_PATH_TO_FOLDER",
+    "exclude_dbs": [
+        "DATABASE_NAME_1",
+        "DATABASE_NAME_2"
+    ]
+}
